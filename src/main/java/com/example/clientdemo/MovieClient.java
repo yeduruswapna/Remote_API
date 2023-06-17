@@ -6,67 +6,72 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Locale;
+import java.awt.*;
 
 public class MovieClient {
-    private String url = "https://api.themoviedb.org/3/movie/%s?api_key=cd46fe13f1442cfa663d94a7d3ed7e5e";
+    private static String url = "https://api.themoviedb.org/3/movie/%s?api_key=cd46fe13f1442cfa663d94a7d3ed7e5e";
+    private static String baseUrl = "https://api.themoviedb.org/3/";
     private static String key = "cd46fe13f1442cfa663d94a7d3ed7e5e";
-    private static String POST_MOVIE_URL = "https://api.themoviedb.org/3/movie?api_key=%s";
-    private static String GET_MOVIE_PATH = "/movie/%s";
-    private static String UPDATE_MOVIE_URL = "/update-movie/%s";
-    private String baseUrl = "https://api.themoviedb.org/3";
+    private static String POST_MOVIE_URL = "/name/%s";
+    private static String GET_MOVIE_PATH = "/get-movie/%s";
+    private static String UPDATE_MOVIE_PATH = "update-movie/%s";
+    private static String DELETE_MOVIE_PATH = "delete-movie/%s";
+
     RestTemplate restTemplate = new RestTemplate();
 
-    public Movie getMovie(Integer id) {
-        String url2 = String.format(url, String.valueOf(id));
-        Movie movie = restTemplate.getForObject(url2, Movie.class);
-        return movie;
 
-    }
-
-    //ADD
-    public String addMovie(Movie movie) {
-        String postUrl = String.format(POST_MOVIE_URL, key);
-        HttpEntity entity = new HttpEntity(movie);
-        ResponseEntity response = restTemplate.exchange(postUrl, HttpMethod.POST, entity, String.class);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return "Movie Added Successfully";
-        }
-        return "Nothing";
-    }
-
-    //UPDATE
-    public String updateMovie(Integer ud, String updatedTitle) {
-        String updateUrl = String.format(UPDATE_MOVIE_URL, key);
-        ResponseEntity response = restTemplate.exchange(updateUrl, HttpMethod.POST, HttpEntity.EMPTY, String.class);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return "Movie Added Successfully";
-        }
-        return "Nothing";
-    }
-
-//    // GET
-//    public Movie getMovie(Movie movie){
-//        String getUrl=String.format(GET_MOVIE_PATH,key);
-//        HttpEntity entity= new HttpEntity(movie);
-//        ResponseEntity<Movie>response= restTemplate.exchange(getUrl, HttpMethod.GET, HttpEntity.EMPTY,Movie.class);
-//        return response.getBody();
+    //    public Movie getMovie(Integer id) {
+//        String getUrl= String.format(url, String.valueOf(id));
+//        Movie movie= restTemplate.getForObject(getUrl, Movie.class);
+//        return movie;
 //    }
+    public Movie getMovie(Integer id) {
+        String getUrl = String.format(url, String.valueOf(id));
+        ResponseEntity<Movie> responseEntity = restTemplate.exchange(getUrl, HttpMethod.GET, HttpEntity.EMPTY, Movie.class);
+        return responseEntity.getBody();
+    }
 
-//    //Other way to UPDATE
-//    public String updateUrl(Integer id, String updateTitle){
+    public String addMovie(Movie movie) {
+        String addUrl = String.format(POST_MOVIE_URL, key);
+        HttpEntity entity = new HttpEntity<>(movie);
+        ResponseEntity responseEntity = restTemplate.exchange(addUrl, HttpMethod.POST, entity, String.class);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            return "Movie Added Successfully";
+        }
+        return "Nothing";
+    }
+
+    public String updateMovie(Integer id, String updatedTitle) {
+        String updateUrl= String.format(UPDATE_MOVIE_PATH,key);
+        ResponseEntity responseEntity=restTemplate.exchange(updateUrl, HttpMethod.PUT, HttpEntity.EMPTY, String.class);
+        if(responseEntity.getStatusCode().is2xxSuccessful()) {
+            return "Movie updated Successfully";
+        }
+        return "Nothing";
+    }
+
+    public String deleteMovie(Integer id) {
+        String deleteUrl = String.format(DELETE_MOVIE_PATH, key);
+        ResponseEntity responseEntity = restTemplate.exchange(deleteUrl, HttpMethod.DELETE, HttpEntity.EMPTY, String.class);
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            return "Movie Deleted Successfully";
+        }
+        return "Nothing";
+    }
+}
+//    Other way to update
+//    public String updateMovie(Integer id, String updatedTitle) {
+//
 //        String updateUrl= UriComponentsBuilder
 //                .fromHttpUrl(baseUrl)
-//                .path(String.format(UPDATE_MOVIE_URL, id))
-//                .queryParam("api_key", key)
+//                .path(String.format(UPDATE_MOVIE_PATH, id))
+//                .queryParam("api-key", key)
 //                .build()
 //                .toUriString();
-//        ResponseEntity response= restTemplate.exchange(updateUrl, HttpMethod.POST, HttpEntity.EMPTY, String.class);
-//        if(response.getStatusCode().is2xxSuccessful()){
-//            return "Movie Added Successfully";
+//        ResponseEntity responseEntity=restTemplate.exchange(updateUrl, HttpMethod.PUT, HttpEntity.EMPTY, String.class);
+//        if(responseEntity.getStatusCode().is2xxSuccessful()) {
+//            return "Movie updated Successfully";
 //        }
 //        return "Nothing";
-//        }
-
-
-}
+//    }
+//
